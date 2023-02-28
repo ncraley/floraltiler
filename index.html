@@ -1,0 +1,117 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <style>
+        #cvs {
+            border: 1px solid black;
+            background: rgb(218, 36, 36);
+        }
+        #patternPreview {
+            border: 1px solid black;
+            background: rgb(218, 36, 36);
+        }
+        #curve1 {
+            width: 100%;
+            max-width: 200px;
+        }
+    </style>
+    <body onload="draw()">
+        <h1>FloralTiler</h1>
+        <canvas id="cvs" width="200" height="200"></canvas>
+        <canvas id="patternPreview" width="80" height="80"></canvas>
+        <div>
+            <input type="range" id="curve1" name="curve1"
+                   min="-25" max="25" value="-6">
+            <label for="curve1">Curve A: <span id="curveVal1">-6</span></label>
+        </div>
+    </body>
+    <script>
+        let patternWidth = 80;
+        let patternHeight = 80;
+        let sideLength = 50;
+        let horizOffset = 2;
+        let vertOffset = 53;
+        let distance = 45;
+        let curve1 = -6;
+        
+        const rotatePoint = (point, fulcrum, degrees) => {
+            const rotation = degrees*Math.PI / 180;
+            const cos = Math.cos(rotation);
+            const sin = Math.sin(rotation);
+            return {
+                x: Math.round((point.x - fulcrum.x)*cos - (point.y - fulcrum.y)*sin + fulcrum.x),
+                y: Math.round((point.x - fulcrum.x)*sin + (point.y - fulcrum.y)*cos + fulcrum.y),
+            };
+        }
+        const drawPattern = (ctx, xPos, yPos, sideL, xOffset = 0, yOffset = 0) => {
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            console.log(xOffset, yOffset);
+            const centerOffset = {
+                x: Math.floor(patternWidth / 2),
+                y: Math.floor(patternHeight / 2),
+            };
+            let startPoint = {
+                x: centerOffset.x, 
+                y: 0,
+            };
+            let endPoint = rotatePoint(startPoint, {x: startPoint.x, y: startPoint.y + sideL}, 25); // TODO: cleanup crazy math
+            let controlPointOne = { // TODO: cleanup crazy math
+                x: Math.floor(44*patternWidth/80),
+                y: Math.floor(8*patternHeight/80),
+            };
+            let controlPointTwo = { // TODO: cleanup crazy math
+                x: Math.floor(44*patternWidth/80),
+                y: Math.floor(12*patternHeight/80),
+            };
+            ctx.moveTo(startPoint.x + xPos + xOffset, startPoint.y + yPos + yOffset);
+            for (let i = 0; i < 12; i++) {
+                const midPoint = {x: (startPoint.x + endPoint.x)/2, y: (startPoint.y + endPoint.y)/2};
+                const magnitude = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2));
+                const normalXFactor = (endPoint.y - startPoint.y)/magnitude;
+                const normalYFactor = (startPoint.x - endPoint.x)/magnitude;
+                const direction = Math.floor((i+1)/2) % 2 === 0 ? -1 : 1;
+                const controlPoint = {x: midPoint.x + normalXFactor*curve1*direction, y: midPoint.y + normalYFactor*curve1*direction};
+
+                ctx.quadraticCurveTo(
+                    controlPoint.x + xPos + xOffset,
+                    controlPoint.y + yPos + yOffset,
+                    endPoint.x + xPos + xOffset,
+                    endPoint.y + yPos + yOffset,
+                );
+                tempStartPoint = JSON.parse(JSON.stringify(startPoint));
+                startPoint = endPoint;
+                const rotation = (i % 2 === 0) ? 120 : ((i + 1) % 4 === 0 ? 90 : 270);
+                endPoint = rotatePoint(tempStartPoint, endPoint, rotation);
+            }
+            ctx.stroke();
+            ctx.closePath();
+        }
+        const draw = () => {
+            const canvas = document.getElementById('cvs');
+            if (canvas.getContext) {
+                const ctx = canvas.getContext('2d');
+                ctx.reset();
+                let prevPoint;
+                for (let i = 0; i < 5*Math.floor(canvas.height/patternWidth); i++) {
+                    for (let j = 0; j < 5*Math.floor(canvas.width/patternHeight); j++) {
+                        const {x, y} = prevPoint ? rotatePoint(i*horizOffset, j*vertOffset, 30) : {x: 1, y: 1}; // TODO: cleanup crazy math
+                        drawPattern(ctx, i*horizOffset + i*distance, j*vertOffset + i*Math.sqrt(3)*distance, sideLength, -150, -370);
+                        prevPoint = {x: i*horizOffset, y: j*vertOffset};
+                    }
+                }
+            }
+            const previewCanvas = document.getElementById('patternPreview');
+            const ptnCtx = previewCanvas.getContext('2d');
+            ptnCtx.reset();
+            drawPattern(ptnCtx, 0, 0, sideLength, -36, 68);
+        }
+
+        const curve1Slider = document.querySelector('#curve1');
+        const curve1Label = document.querySelector('#curveVal1');
+        curve1Slider.addEventListener('input', (event) => {
+            curve1 = Number(event.target.value);
+            draw();
+            curve1Label.textContent = event.target.value;
+        });
+    </script>
+</html>
