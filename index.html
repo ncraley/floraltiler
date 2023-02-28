@@ -45,7 +45,6 @@
         const drawPattern = (ctx, xPos, yPos, sideL, xOffset = 0, yOffset = 0) => {
             ctx.fillStyle = '#000';
             ctx.beginPath();
-            console.log(xOffset, yOffset);
             const centerOffset = {
                 x: Math.floor(patternWidth / 2),
                 y: Math.floor(patternHeight / 2),
@@ -90,7 +89,7 @@
             const canvas = document.getElementById('cvs');
             if (canvas.getContext) {
                 const ctx = canvas.getContext('2d');
-                ctx.reset();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 let prevPoint;
                 for (let i = 0; i < 5*Math.floor(canvas.height/patternWidth); i++) {
                     for (let j = 0; j < 5*Math.floor(canvas.width/patternHeight); j++) {
@@ -102,7 +101,7 @@
             }
             const previewCanvas = document.getElementById('patternPreview');
             const ptnCtx = previewCanvas.getContext('2d');
-            ptnCtx.reset();
+            ptnCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
             drawPattern(ptnCtx, 0, 0, sideLength, -36, 68);
         }
 
