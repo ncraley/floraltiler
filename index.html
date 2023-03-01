@@ -16,8 +16,8 @@
     </style>
     <body onload="draw()">
         <h1>FloralTiler</h1>
-        <canvas id="cvs" width="200" height="200"></canvas>
-        <canvas id="patternPreview" width="200" height="200"></canvas>
+        <canvas id="cvs" width="400" height="400"></canvas>
+        <canvas id="patternPreview" width="400" height="400"></canvas>
         <div>
             <input type="range" id="curve1" name="curve1"
                    min="-40" max="25" value="3">
@@ -25,12 +25,12 @@
         </div>
     </body>
     <script>
-        let patternWidth = 80;
-        let patternHeight = 80;
-        let sideLength = 1;
+        let patternWidth = 160;
+        let patternHeight = 160;
+        let sideLength = 2;
         let horizOffset = 0;
-        let vertOffset = 41;
-        let distance = 35;
+        let vertOffset = 82;
+        let distance = 70.5;
         let curve1 = 3;
         
         const rotatePoint = (point, fulcrum, degrees) => {
@@ -46,8 +46,8 @@
             ctx.fillStyle = '#000';
             ctx.beginPath();
             const centerOffset = {
-                x: sideLength*80 / 2,
-                y: sideLength*80 / 2,
+                x: sideLength*patternWidth / 2,
+                y: sideLength*patternHeight / 2,
             };
             const pointDistances = [33, 23, 9, 23, 33, 23, 9, 23, 33, 23, 9, 23, 33];
             let startPoint = rotatePoint({x: centerOffset.x, y: centerOffset.y + pointDistances[0]*sideL}, centerOffset, rotationOffset);
@@ -84,7 +84,7 @@
                 for (let i = 0; i < 5*Math.floor(canvas.height/patternWidth); i++) {
                     for (let j = 0; j < 5*Math.floor(canvas.width/patternHeight); j++) {
                         const {x, y} = prevPoint ? rotatePoint(i*horizOffset, j*vertOffset, 30) : {x: 1, y: 1}; // TODO: cleanup crazy math
-                        drawPattern(ctx, i*horizOffset + i*distance, j*vertOffset + i*Math.sqrt(3)*distance, sideLength, -10, -240, 3, 179); // TODO: cleanup crazy math
+                        drawPattern(ctx, i*horizOffset + i*distance, j*vertOffset + i*Math.sqrt(3)*distance, sideLength, -125, -580, 3, 179.3); // TODO: cleanup crazy math
                         prevPoint = {x: i*horizOffset, y: j*vertOffset};
                     }
                 }
