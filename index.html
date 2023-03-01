@@ -17,10 +17,10 @@
     <body onload="draw()">
         <h1>FloralTiler</h1>
         <canvas id="cvs" width="200" height="200"></canvas>
-        <canvas id="patternPreview" width="80" height="80"></canvas>
+        <canvas id="patternPreview" width="200" height="200"></canvas>
         <div>
             <input type="range" id="curve1" name="curve1"
-                   min="-25" max="25" value="3">
+                   min="-40" max="25" value="3">
             <label for="curve1">Curve A: <span id="curveVal1">3</span></label>
         </div>
     </body>
@@ -46,8 +46,8 @@
             ctx.fillStyle = '#000';
             ctx.beginPath();
             const centerOffset = {
-                x: patternWidth / 2,
-                y: patternHeight / 2,
+                x: sideLength*80 / 2,
+                y: sideLength*80 / 2,
             };
             const pointDistances = [33, 23, 9, 23, 33, 23, 9, 23, 33, 23, 9, 23, 33];
             let startPoint = rotatePoint({x: centerOffset.x, y: centerOffset.y + pointDistances[0]*sideL}, centerOffset, rotationOffset);
@@ -60,7 +60,7 @@
                 const normalXFactor = (endPoint.y - startPoint.y)/magnitude;
                 const normalYFactor = (startPoint.x - endPoint.x)/magnitude;
                 const direction = Math.floor((i+1)/2) % 2 === 0 ? -1 : 1;
-                const controlPoint = {x: midPoint.x + normalXFactor*curve1*direction, y: midPoint.y + normalYFactor*curve1*direction};
+                const controlPoint = {x: midPoint.x + normalXFactor*curve1*direction*sideL, y: midPoint.y + normalYFactor*curve1*direction*sideL};
 
                 ctx.quadraticCurveTo(
                     controlPoint.x + xPos + xOffset,
@@ -92,7 +92,7 @@
             const previewCanvas = document.getElementById('patternPreview');
             const ptnCtx = previewCanvas.getContext('2d');
             ptnCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-            drawPattern(ptnCtx, 0, 0, sideLength, 0, 0, 3, 180);
+            drawPattern(ptnCtx, 0, 0, sideLength*2.5, 55, 65, 3, 180);
         }
 
         const curve1Slider = document.querySelector('#curve1');
